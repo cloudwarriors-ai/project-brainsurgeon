@@ -1,0 +1,13 @@
+{
+  "name": "hello-world-test",
+  "version": "1.0.0",
+  "description": "Hello World application with Playwright testing",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 3000",
+    "test": "npx playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

@@ -1,0 +1,8 @@
+npm error code E404
+npm error 404 Not Found - GET https://registry.npmjs.org/nonexistent-package - Not found
+npm error 404
+npm error 404  'nonexistent-package@^999.999.999' is not in this registry.
+npm error 404
+npm error 404 Note that you can also install from a
+npm error 404 tarball, folder, http url, or git url.
+npm error A complete log of this run can be found in: /root/.npm/_logs/2025-09-23T00_50_40_125Z-debug-0.log

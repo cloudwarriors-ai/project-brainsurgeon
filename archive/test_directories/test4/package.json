@@ -1,0 +1,16 @@
+{
+  "name": "hello-world-test4",
+  "version": "1.0.0",
+  "description": "Hello World application with iterative improvement (Test4)",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 3003",
+    "test": "npx playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  },
+  "keywords": ["hello-world", "test", "iterative"],
+  "author": "Builder Agent (Iterative)",
+  "license": "MIT"
+}

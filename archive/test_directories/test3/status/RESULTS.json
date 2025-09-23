@@ -1,0 +1,63 @@
+{
+  "task": "hello-world-test3-build",
+  "status": "failed",
+  "timestamp": "2025-09-22T17:35:00Z",
+  "outputs": [
+    "index.html (BROKEN - syntax errors)",
+    "package.json (BROKEN - invalid dependencies)", 
+    "playwright.config.js (BROKEN - syntax errors)",
+    "tests/hello-world.test.js (BROKEN - syntax errors)"
+  ],
+  "test_results": {
+    "status": "not_executed",
+    "reason": "configuration_errors_prevent_execution",
+    "total_tests": "unknown",
+    "passed": 0,
+    "failed": "not_run"
+  },
+  "build_artifacts": [
+    "Broken HTML application with syntax errors",
+    "Invalid Playwright configuration",
+    "Non-functional test suite",
+    "Failed dependency installation"
+  ],
+  "errors": [
+    {
+      "type": "dependency_error",
+      "description": "nonexistent-package@^999.999.999 not found",
+      "impact": "critical",
+      "stage": "npm_install"
+    },
+    {
+      "type": "syntax_error", 
+      "description": "Missing comma in playwright.config.js line 18",
+      "impact": "critical",
+      "stage": "configuration"
+    },
+    {
+      "type": "syntax_error",
+      "description": "Missing closing parenthesis in test file",
+      "impact": "critical", 
+      "stage": "test_development"
+    },
+    {
+      "type": "logic_error",
+      "description": "HTML uses #broken-hello but tests look for #hello-world",
+      "impact": "critical",
+      "stage": "implementation"
+    }
+  ],
+  "verification": {
+    "hello_world_element": "present_but_wrong_id",
+    "tests_passing": "cannot_execute",
+    "application_functional": "broken",
+    "build_complete": false
+  },
+  "recovery_suggestions": [
+    "Fix package.json to remove nonexistent-package dependency",
+    "Correct syntax errors in playwright.config.js", 
+    "Fix HTML element ID from #broken-hello to #hello-world",
+    "Fix test file syntax errors",
+    "Retry npm install after fixing package.json"
+  ]
+}

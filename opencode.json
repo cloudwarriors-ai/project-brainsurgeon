@@ -1,0 +1,40 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "opencode-bridge": {
+      "type": "local",
+      "command": ["bash", "-c", "cd /root/code/project-brainsurgeon && . venv/bin/activate && python mcp_server.py"],
+      "enabled": true
+    },
+ 
+  },
+  "agent": {
+    "supervisor": {
+      "description": "Background event supervisor; polls opencode-bridge.get_next_event and processes events until an exit condition.",
+      "mode": "subagent",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny",
+        "webfetch": "deny"
+      },
+      "prompt": "You are Supervisor. Repeatedly call the MCP tool opencode-bridge.get_next_event with a short timeout (~1000ms). For each event: minimally summarize and, if useful, call opencode-bridge.show_toast. Stop when: (a) an event indicates completion (e.g., session.completed or message.part.updated with type 'step-end'), (b) idle with no events for 10 seconds, or (c) 60 seconds total elapsed. Do not run bash, edit files, or use webfetch."
+    }
+  },
+  "command": {
+    "supervise-events": {
+      "template": "Act as Supervisor and process opencode-bridge events until exit. Defaults: max_seconds=60 idle_ms=10000 stop_on=session.completed|message.part.updated:type=step-end. Begin.",
+      "description": "Run the Supervisor subagent to monitor events and exit on completion/idle/timeout.",
+      "agent": "supervisor",
+      "subtask": true
+    }
+  },
+  "experimental": {
+    "hook": {
+      "session_completed": [
+        {
+          "command": ["opencode", "command", "supervise-events"]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "hello-world-test2",
+  "version": "1.0.0",
+  "description": "Enhanced Hello World application with Playwright testing (Test2)",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 3001",
+    "test": "npx playwright test",
+    "test:report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  },
+  "keywords": ["hello-world", "test", "playwright"],
+  "author": "Builder Agent",
+  "license": "MIT"
+}

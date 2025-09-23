@@ -1,0 +1,3 @@
+Testing if file operations generate events in the OpenCode event stream.
+This file was created to test event generation.
+Timestamp: $(date)

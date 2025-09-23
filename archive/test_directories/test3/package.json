@@ -1,0 +1,18 @@
+{
+  "name": "hello-world-test3-broken",
+  "version": "1.0.0",
+  "description": "BROKEN Hello World application for testing failure scenarios",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 3002",
+    "test": "npx playwright test",
+    "broken-script": "this-command-does-not-exist"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "nonexistent-package": "^999.999.999"
+  },
+  "keywords": ["hello-world", "test", "broken", "failure"],
+  "author": "Builder Agent (Intentionally Broken)",
+  "license": "MIT"
+}
