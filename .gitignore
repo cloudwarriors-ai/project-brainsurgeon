@@ -1,1 +1,72 @@
-node_modules
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+mcp_env/
+env/
+ENV/
+
+# Logs
+*.log
+*.log.*
+.screen_output*.txt
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Chrome/Playwright data
+chrome-data-playwright/
+
+# Temporary files
+.opencode/
+*.tmp
+*.temp
+
+# Screen terminal logs
+screen-terminal.log
+
+# Supervisor logs
+supervisor*.log
+local_event_supervisor.log
+stop_event_supervisor.log
+
+# Test files
+test_*.js
+test_*.py
+
+# Configuration files with secrets
+.env
+config.sh
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
