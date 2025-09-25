@@ -84,7 +84,8 @@ wss.on('connection', (ws, request) => {
   
   try {
     // Use node-pty to create a proper pseudo-terminal for screen
-    ptyProcess = pty.spawn('screen', [`-r`, sessionName], {
+    // Use -x instead of -r to allow multiple connections to attached sessions
+    ptyProcess = pty.spawn('screen', [`-x`, sessionName], {
       name: 'xterm-256color',
       cols: terminalSize.cols,
       rows: terminalSize.rows,
@@ -110,15 +111,44 @@ wss.on('connection', (ws, request) => {
         
         if (parsed.type === 'input' && parsed.data) {
           ptyProcess.write(parsed.data);
+        } else if (parsed.type === 'detach') {
+          // Handle explicit detach request using screen's built-in detach
+          // Use screen's detach command directly on the session
+          execAsync(`screen -S ${sessionName} -X detach`).then(() => {
+            // After detach command succeeds, close the connection
+            setTimeout(() => {
+              if (ptyProcess) {
+                ptyProcess.kill();
+              }
+              ws.close();
+            }, 100);
+          }).catch(err => {
+            console.error('Detach command failed:', err);
+            // Fallback: try sending detach sequence through pty
+            ptyProcess.write('\x01'); // Ctrl+A
+            setTimeout(() => {
+              ptyProcess.write('d'); // D
+              setTimeout(() => {
+                if (ptyProcess) {
+                  ptyProcess.kill();
+                }
+                ws.close();
+              }, 200);
+            }, 100);
+          });
         } else if (parsed.type === 'resize' && parsed.cols && parsed.rows) {
           // Handle terminal resize
           terminalSize.cols = parsed.cols;
           terminalSize.rows = parsed.rows;
           try {
             ptyProcess.resize(parsed.cols, parsed.rows);
-            console.log(`Terminal resized to ${parsed.cols}x${parsed.rows}`);
+
+            // Note: Screen sessions maintain their original size when attached.
+            // The ptyProcess.resize() ensures the terminal display matches the browser window,
+            // but the underlying screen session content may not reflow to the new size.
+            // This is a limitation of screen's design - sessions are sized when created.
           } catch (resizeError) {
-            console.error('Error resizing terminal:', resizeError);
+            // Silently handle resize errors
           }
         }
       } catch (error) {
@@ -129,7 +159,19 @@ wss.on('connection', (ws, request) => {
     // Handle WebSocket close
     ws.on('close', () => {
       if (ptyProcess) {
-        ptyProcess.kill();
+        // Try to detach using screen command first
+        execAsync(`screen -S ${sessionName} -X detach`).then(() => {
+          ptyProcess.kill();
+        }).catch(err => {
+          // Fallback: send detach sequence through pty
+          ptyProcess.write('\x01'); // Ctrl+A
+          setTimeout(() => {
+            ptyProcess.write('d'); // D
+            setTimeout(() => {
+              ptyProcess.kill();
+            }, 200);
+          }, 200);
+        });
       }
       activeTerminals.delete(ws);
     });

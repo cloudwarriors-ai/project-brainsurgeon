@@ -92,6 +92,8 @@
             padding: 20px;
             border-radius: 8px;
             display: none;
+            width: 100%;
+            box-sizing: border-box;
         }
         .terminal-header {
             display: flex;
@@ -116,7 +118,8 @@
         }
         #terminal {
             width: 100%;
-            height: 500px;
+            height: calc(100vh - 200px);
+            min-height: 400px;
             background-color: #000;
             border-radius: 4px;
         }
@@ -182,29 +185,29 @@
         // Load screen sessions
         async function loadSessions() {
             try {
-                const response = await fetch('/api/sessions');
+                const apiUrl = window.location.origin + '/api/sessions';
+                const response = await fetch(apiUrl);
                 const sessions = await response.json();
                 displaySessions(sessions);
             } catch (error) {
                 console.error('Error loading sessions:', error);
-                document.getElementById('sessionsList').innerHTML = 
-                    '<div class="error">Error loading sessions</div>';
+                document.getElementById('sessionsList').innerHTML =
+                    '<div class="error">Error loading sessions: ' + error.message + '</div>';
             }
         }
 
         // Display sessions in the UI
         function displaySessions(sessions) {
             const container = document.getElementById('sessionsList');
-            
+
             if (sessions.length === 0) {
                 container.innerHTML = '<div class="loading">No screen sessions found. Create one to get started.</div>';
                 return;
             }
 
             container.innerHTML = sessions.map(session => `
-                <div class="session-card" onclick="connectToSession('${session.name}')">
-                    <h3>${session.name}</h3>
-                    <p><strong>PID:</strong> ${session.pid}</p>
+                <div class="session-card" onclick="connectToSession('${session.pid}.${session.name}')">
+                    <h3>${session.pid}.${session.name}</h3>
                     <p><strong>Status:</strong> ${session.status}</p>
                 </div>
             `).join('');
@@ -221,7 +224,8 @@
             }
 
             try {
-                const response = await fetch('/api/sessions', {
+                const apiUrl = window.location.origin + '/api/sessions';
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -286,9 +290,18 @@
                 fitAddon.fit();
                 sendTerminalResize();
             };
-            
+
+            // Listen for window resize
             window.addEventListener('resize', handleResize);
-            
+
+            // Also listen for terminal container resize using ResizeObserver
+            if (window.ResizeObserver) {
+                const resizeObserver = new ResizeObserver(() => {
+                    handleResize();
+                });
+                resizeObserver.observe(terminalElement);
+            }
+
             // Initial resize
             setTimeout(handleResize, 100);
 
@@ -309,7 +322,6 @@
                     cols, 
                     rows 
                 }));
-                console.log(`Sent terminal resize: ${cols}x${rows}`);
             }
         }
 
@@ -328,7 +340,7 @@
             
             if (currentHost === 'wondrous-radically-bluebird.ngrok-free.app') {
                 // Use the separate WebSocket ngrok tunnel
-                wsUrl = `wss://bb780517535f.ngrok.app?session=${encodeURIComponent(sessionName)}`;
+                wsUrl = `wss://279058511481.ngrok.app?session=${encodeURIComponent(sessionName)}`;
             } else if (currentHost.includes('ngrok') || currentHost !== 'localhost') {
                 // For other custom domains and ngrok, use the same domain but with wss protocol
                 wsUrl = `${protocol}//${currentHost}?session=${encodeURIComponent(sessionName)}`;
@@ -384,7 +396,15 @@
         // Close terminal and return to session list
         function closeTerminal() {
             if (socket) {
-                socket.close();
+                // Send detach command before closing
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ type: 'detach' }));
+                    setTimeout(() => {
+                        socket.close();
+                    }, 500);
+                } else {
+                    socket.close();
+                }
             }
             if (terminal) {
                 terminal.dispose();
